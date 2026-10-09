@@ -30,3 +30,18 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t sentiment-analysis:latest .
+
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Publish Docker image
+        if: github.event_name == 'push'
+        run: |
+          docker tag sentiment-analysis:latest edwardmoswane/sentiment-analysis-project:latest
+          docker tag sentiment-analysis:latest edwardmoswane/sentiment-analysis-project:${{ github.sha }}
+          docker push edwardmoswane/sentiment-analysis-project:latest
+          docker push edwardmoswane/sentiment-analysis-project:${{ github.sha }}
